@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamza & Hafsa Wedding</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root { --gold: #c5a059; --white: #ffffff; }
+
+        body {
+            margin: 0; padding: 0;
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh;
+            transition: background 1.5s ease-in-out;
+        }
+
+        body.revealed {
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('nikah.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .envelope-wrapper {
+            position: relative;
+            width: 320px; height: 210px;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 1s ease;
+        }
+
+        .envelope {
+            position: absolute; width: 100%; height: 100%;
+            background: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            z-index: 5; overflow: hidden;
+        }
+
+        .envelope::before {
+            content: ""; position: absolute; top: 0; left: 0;
+            border-left: 160px solid transparent; border-right: 160px solid transparent;
+            border-top: 105px solid #f2f2f2;
+            transform-origin: top; transition: transform 0.6s ease;
+            z-index: 6;
+        }
+
+        .corner {
+            position: absolute; width: 50px; height: 50px;
+            background-image: url('https://www.transparentpng.com/download/gold-floral/gold-floral-png-photos-3.png');
+            background-size: contain; background-repeat: no-repeat;
+            z-index: 7; opacity: 0.6;
+        }
+        .top-left { top: 5px; left: 5px; }
+        .top-right { top: 5px; right: 5px; transform: rotate(90deg); }
+        .bottom-left { bottom: 5px; left: 5px; transform: rotate(-90deg); }
+        .bottom-right { bottom: 5px; right: 5px; transform: rotate(180deg); }
+
+        .gold-seal {
+            position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%);
+            width: 55px; height: 55px; background: var(--gold);
+            border-radius: 50%; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 14px; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid #b38e4a;
+        }
+
+        .card {
+            position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+            background: var(--white); padding: 30px 10px; text-align: center;
+            border: 1px solid #f2f2f2; opacity: 0; visibility: hidden;
+            transition: all 1s ease; z-index: 2;
+        }
+
+        .open .envelope-wrapper { transform: translateY(180px); }
+        .open .envelope::before { transform: rotateX(180deg); }
+        .open .card {
+            opacity: 1; visibility: visible;
+            transform: translateY(-330px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        /* --- Updated Names Styling --- */
+        h1 { 
+            font-family: 'Great Vibes', cursive; /* Cursive Font */
+            font-size: 2.4rem; /* Thoda bada size cursive ke liye */
+            color: #333; 
+            margin: 10px 0; 
+            font-weight: normal;
+            letter-spacing: 2px; /* Isse names 'chute-chute' dikhenge */
+            word-spacing: 5px; 
+        }
+        /* ----------------------------- */
+
+        .names-tag { font-size: 0.7rem; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; }
+
+        #countdown { display: flex; justify-content: center; gap: 10px; margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; }
+        .box { display: flex; flex-direction: column; min-width: 55px; }
+        .num { font-size: 1.5rem; color: #222; font-weight: bold; }
+        .label { font-size: 0.6rem; color: #999; text-transform: uppercase; }
+
+        .date-text { margin-top: 20px; font-size: 0.9rem; color: var(--gold); letter-spacing: 2px; font-weight: bold; }
+        .instruction { position: absolute; bottom: -50px; width: 100%; text-align: center; color: white; font-size: 0.8rem; letter-spacing: 2px; animation: bounce 2s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    </style>
+</head>
+<body>
+
+    <audio id="weddingMusic" loop>
+        <source src="wedding_nasheed.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="envelope-wrapper" onclick="reveal()">
+        <div class="envelope">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+            <div class="gold-seal">H & H</div>
+        </div>
+        
+        <div class="card" id="mainCard">
+            <p class="names-tag">The Nikkah Of</p>
+            <h1>Hamza & Hafsa</h1>
+            <div id="countdown">
+                <div class="box"><span class="num" id="days">00</span><span class="label">Days</span></div>
+                <div class="box"><span class="num" id="hours">00</span><span class="label">Hrs</span></div>
+                <div class="box"><span class="num" id="mins">00</span><span class="label">Min</span></div>
+                <div class="box"><span class="num" id="secs">00</span><span class="label">Sec</span></div>
+            </div>
+            <p class="date-text">14 NOVEMBER 2026</p>
+        </div>
+        <div class="instruction">TAP TO OPEN INVITE 💌</div>
+    </div>
+
+    <script>
+        function reveal() {
+            var audio = document.getElementById('weddingMusic');
+            audio.play().catch(e => console.log("Play blocked"));
+
+            document.body.classList.add('revealed');
+            document.body.classList.add('open');
+
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#c5a059', '#ffffff'] });
+
+            const weddingDate = new Date("Nov 14, 2026 00:00:00").getTime();
+            setInterval(function() {
+                const now = new Date().getTime();
+                const diff = weddingDate - now;
+                if (diff < 0) return;
+                document.getElementById("days").innerText = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById("hours").innerText = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                document.getElementById("mins").innerText = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById("secs").innerText = Math.floor((diff % (1000 * 60)) / 1000);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
